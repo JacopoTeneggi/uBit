@@ -1,30 +1,29 @@
 'use strict';
 
+const http = require('http');
+const express = require('express');
+const url = require('url');
 const ws = require('ws');
-const noble = require('noble');
 
-let isNobleRady = false;
+const app = express();
 
-noble.on('stateChange', state => {
-    isNobleRady = !isNobleRady;
-    console.log(`Noble toggled state to ${isNobleRady}`);
+app.use((req, res) => {
+    res.send('HELLO');
 });
 
-const wss = new ws.Server({
-    perMessageDeflate: false,
-    port: 8080
-});
-console.log(`Server listening on port ${8080}`);
+const server = http.createServer(app);
+const wss = new ws.Server({ server });
 
 wss.on('connection', (ws) => {
+    const location = url.parse(ws.upgradeReq.url, true);
+
     ws.on('message', (message) => {
         console.log(`Received ${message}`);
     });
 
-    if (isNobleRady) {
-        noble.startScanning();
-        ws.send('NOBLE STARTED SCANNING...');
-    } else {
-        ws.send('NOBLE IS NOT READY');
-    }
+    ws.send('something');
+});
+
+server.listen(8080, () => {
+    console.log('Express listening on port 8080');
 });
