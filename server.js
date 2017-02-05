@@ -3,6 +3,13 @@
 const ws = require('ws');
 const noble = require('noble');
 
+let isNobleRady = false;
+
+noble.on('stateChange', state => {
+    isNobleRady = !isNobleRady;
+    console.log(`Noble toggled state to ${isNobleRady}`);
+});
+
 const wss = new ws.Server({
     perMessageDeflate: false,
     port: 8080
@@ -14,5 +21,10 @@ wss.on('connection', (ws) => {
         console.log(`Received ${message}`);
     });
 
-    ws.send('something');
+    if (isNobleRady) {
+        noble.startScanning();
+        ws.send('NOBLE STARTED SCANNING...');
+    } else {
+        ws.send('NOBLE IS NOT READY');
+    }
 });
