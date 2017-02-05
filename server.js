@@ -3,7 +3,7 @@
 const ws = require('ws');
 const noble = require('noble');
 
-const wss = new WebSocket.Server({
+const wss = new ws.Server({
     perMessageDeflate: false,
     port: 8080
 });
